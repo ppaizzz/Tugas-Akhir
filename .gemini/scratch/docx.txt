@@ -1,0 +1,179 @@
+
+Sistem Informasi Penjualan & Stok Berbasis Web
+
+Modul utama:
+Pengelolaan Stok Cabang : untuk prosesnnya yaitu mulai dari kepala cabang memeriksa stok lalu gateway stok menipis? Jika tidak akan memperbarui stok , jika ita kepala cabang mengajukan permintaan barang lalu admin pusat menerima pengajuan permintaan lalu ada gateway stok tersedia? Jika iya akan menyiapkan dan mengirim barang ke cabang lalu kepala cabang menerima barang dari pusat, jika tidak admin pusat akan mengorder barang ke supplier lalu menuggu orderan dan menerima barang orderan dan mengirim barang orderan ke kepala cabang dan kepala cabang merima barang dari pusat lalu kepala cabang memperbarui stok dan selesai
+
+Proses Keep Barang : untuk proses ini muai dari pelangan dan pelanggan memilih barang  laly meminta barang untuk di keep setelah itu kasir akan menyetujui keep barang dan memisahkan barang dari rak , lalu memberi tanda keeo (label/nama pelanggan) setelah itu mencatat data keep barang lalu meunggu batas waktu keep lalu ke gateway pelanggan datang Kembali sebelum wakatu habis? Jika tidak kasir akan mengembalikan barang ke rak lalu selesai, jika iya pelanggan datang untuk membeli lalu lanjut ke proses pembayaran lalu memilih metode pembayaran dan lanjut gateway tunai/transfer , kalua utuk transfer kasir akan memberikan  nomor rekening lalu pelanggan mentransfer uang dan  kasir membuat nota penjualan lalu memberikan barang dan pelanggan menerima barang  laly selsai jika tunaik pelangan memberikan uang tunai lalu kasir akan membuat nota penjualan dan memberikan barang lalu pelanggan menerima barang dan selesai.
+
+
+Proses Penjualan : untuk proses ini mulai dari pelanggan memilih barang lalu gateway spesfikasi sesuai?jika tidak menanyakan spesfikasi dibutuhkan lalu kasir akan mencari spesfikasi yang dibutuhkan lalu ada gateway ada? Jika tidak memberi tahu stok kosong ke pelanggan lalu pelanggan menerima pembirtahuan lalu ada gateway pilih barang laim? Jika iya Kembali ke memilih barang jika tidak selesai lalu jika spesfikasi yang dibutuhkan ada kasir akan lanjut menanyakan member dan jika spesfikasi sesuai kasir akan lanjut menanyakan member setelah itu kasir akan memproses pembelian barang lalu pelanggan memilih metode pembayaran lalu ada gateway tunai/transfer jika tunai pelanggan memberikan uang tunai dan pelanggan membuat nita penjualan jika transfer kasir akan memberikanb nomor rekening dan pelanggan mentransfer uang lalu lanjut kasi membuat nota penjualan setelah itu memberikan barang dan pelanggan menerima barang , lalu kasir akan mencatat transaksi dibuku dan mengurangi stok barang dibuku dan selesai 
+
+(Tambahan) Laporan → sebagai data object , ini digabungkan ke dalam modul yang membutuhkan laporan 
+
+
+✅ 1. MODUL PENGELOLAAN STOK CABANG
+
+🔹 Fungsi Utama:
+•Sistem menyimpan data stok barang di database
+•Sistem menampilkan stok real-time
+•Sistem update stok otomatis dari transaksi
+
+🔹 Functional Requirements:
+Admin/Kepala Cabang dapat:
+Menambah data barang
+Mengubah data barang
+Menghapus data barang
+Sistem dapat:
+Menyimpan data barang (nama, kode, harga, stok)
+Menampilkan stok barang per cabang
+Mengurangi stok saat terjadi penjualan
+Menambah stok saat ada pembelian barang
+Sistem menyediakan:
+Pencarian barang
+Filter stok (tersedia / habis)
+
+
+2. MODUL KEEP BARANG (RESERVASI)
+
+🔹 Fungsi Utama:
+
+Barang disimpan sementara untuk pelanggan sebelum dibayar
+
+🔹 Functional Requirements:
+Kasir dapat:
+Menyimpan barang (keep)
+Menentukan batas waktu keep
+Sistem dapat:
+Menyimpan data keep (barang, pelanggan, waktu)
+Mengurangi stok sementara
+Mengembalikan stok jika waktu habis
+3.Sistem memiliki:
+•⏱ Timer (Intermediate Timer Event)
+→ untuk batas waktu keep
+Gateway:
+Apakah waktu keep habis?
+Ya → stok dikembalikan
+Tidak → lanjut ke pembayaran
+
+⸻
+
+✅ 3. MODUL PROSES PENJUALAN
+
+🔹 Fungsi Utama:
+
+Proses transaksi dari pilih barang sampai pembayaran
+
+🔹 Functional Requirements:
+
+👤 Pelanggan:
+•Memilih barang
+•Memilih metode pembayaran (tunai / transfer)
+
+👨‍💼 Kasir:
+•Login ke sistem
+•Input barang ke sistem
+•Memproses transaksi
+
+🖥 Sistem:
+•Mengambil data barang dari database
+•Menghitung total harga
+•Mengelola pembayaran
+•Menyimpan transaksi
+
+
+🔹 DETAIL ALUR (PENTING – sesuai BPMN kamu):
+
+1. Login
+•Kasir login ke sistem
+
+2. Input Barang
+•Kasir input barang
+•Sistem cek stok
+
+3. Gateway:
+
+Stok tersedia?
+•Tidak → tampilkan “stok habis”
+•Ya → lanjut
+
+⸻
+
+4. Pilih Metode Pembayaran
+
+💵 Tunai:
+•Kasir menerima uang
+•Sistem mencatat pembayaran
+•Kasir klik cetak struk
+
+⸻
+
+💳 Transfer:
+•Kasir memberikan nomor rekening
+
+🔁 Sistem:
+•Menunggu pembayaran
+
+⏱ Intermediate Event:
+•Menunggu konfirmasi transfer
+
+Gateway:
+
+Pembayaran sudah masuk?
+•Belum → tetap menunggu
+•Sudah → lanjut
+
+⸻
+
+Setelah pembayaran:
+•Sistem konfirmasi pembayaran
+•Kasir klik cetak struk
+•Sistem simpan transaksi
+•Sistem update stok
+
+⸻
+
+✅ 4. MODUL LAPORAN (DATA OBJECT)
+
+🔹 Fungsi:
+
+Gabungan semua data
+
+🔹 Data yang dihasilkan:
+•Laporan penjualan
+•Laporan stok
+•Laporan keep barang
+
+🔹 Functional Requirements:
+1.Admin / Manager dapat:
+•Melihat laporan
+•Filter berdasarkan tanggal
+•Export data (opsional)
+2.Sistem:
+•Mengambil data dari database
+•Menampilkan dalam bentuk tabel
+
+⸻
+
+🧠 ROLE / AKTOR DALAM SISTEM
+
+👥 Aktor:
+•Kasir
+•Kepala Cabang
+•Admin Pusat
+•Manager/Owner
+
+🖥 Sistem:
+•Database
+•Proses otomatis (stok, pembayaran, laporan)
+
+⸻
+
+🚀 KESIMPULAN
+
+Sistem sudah mencakup:
+•✅ Otomatisasi stok
+•✅ Pembayaran digital
+•✅ Keep barang dengan timer
+•✅ Laporan terintegrasi
+

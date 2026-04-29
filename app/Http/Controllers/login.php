@@ -62,6 +62,8 @@ class login extends Controller
                 return redirect()->route('dashboard.kepalaCabang');
             case 'kasir':
                 return redirect()->route('dashboard.kasir');
+            case 'manager':
+                return redirect()->route('dashboard.manager');    
             default:
                 Auth::logout();
                 return redirect('/login')->withErrors(['email' => 'Role tidak dikenali.']);
