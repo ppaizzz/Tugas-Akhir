@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stok Cabang - Kepala Cabang</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 font-sans">
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-        <div class="flex justify-between items-center mb-6">
+@extends('layouts.app')
+@section('title', 'Stok Cabang - Kepala Cabang')
+@section('header', 'Manajemen Stok Cabang')
+
+@section('content')
+<div class="max-w-6xl mx-auto">
+<div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Manajemen Stok Cabang</h1>
             <div class="space-x-4">
                 <a href="{{ route('kepalaCabang.permintaan.create') }}" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition">+ Ajukan Permintaan</a>
@@ -68,6 +64,5 @@
                 </table>
             </div>
         </div>
-    </div>
-</body>
-</html>
+</div>
+@endsection

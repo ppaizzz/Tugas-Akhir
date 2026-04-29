@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajukan Permintaan Barang</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 font-sans">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <div class="flex justify-between items-center mb-6">
+@extends('layouts.app')
+@section('title', 'Ajukan Permintaan Barang')
+@section('header', 'Ajukan Permintaan Barang ke Pusat')
+
+@section('content')
+<div class="max-w-6xl mx-auto">
+<div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Ajukan Permintaan Barang ke Pusat</h1>
             <a href="{{ route('kepalaCabang.permintaan.index') }}" class="text-gray-600 hover:text-gray-800 font-medium">&larr; Batal</a>
         </div>
@@ -57,6 +53,5 @@
                 </div>
             </form>
         </div>
-    </div>
-</body>
-</html>
+</div>
+@endsection

@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Point of Sale - Kasir</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 font-sans">
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <div class="flex justify-between items-center mb-6">
+@extends('layouts.app')
+@section('title', 'Point of Sale - Kasir')
+@section('header', 'Point of Sale (POS)')
+
+@section('content')
+<div class="max-w-6xl mx-auto">
+<div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Point of Sale (POS)</h1>
             <div class="space-x-4">
                 <a href="{{ route('kasir.keep.index') }}" class="text-blue-600 hover:text-blue-800 font-medium">Lihat Daftar Keep</a>
@@ -117,6 +113,5 @@
                 @endif
             </div>
         </div>
-    </div>
-</body>
-</html>
+</div>
+@endsection

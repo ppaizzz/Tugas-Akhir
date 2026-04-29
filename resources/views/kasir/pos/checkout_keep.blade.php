@@ -1,3 +1,9 @@
+@extends('layouts.app')
+@section('title', 'Checkout Keep Barang')
+@section('header', 'Checkout Keep Barang')
+
+@section('content')
+<div class="max-w-6xl mx-auto">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,6 +64,5 @@
                 <button type="submit" class="w-2/3 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition">Selesaikan Pembayaran</button>
             </div>
         </form>
-    </div>
-</body>
-</html>
+</div>
+@endsection

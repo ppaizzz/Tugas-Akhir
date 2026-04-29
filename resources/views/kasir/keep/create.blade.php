@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Keep Barang</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 font-sans">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <div class="flex justify-between items-center mb-6">
+@extends('layouts.app')
+@section('title', 'Form Keep Barang')
+@section('header', 'Buat Keep Barang Baru')
+
+@section('content')
+<div class="max-w-6xl mx-auto">
+<div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Buat Keep Barang Baru</h1>
             <a href="{{ route('kasir.keep.index') }}" class="text-gray-600 hover:text-gray-800 font-medium">&larr; Batal</a>
         </div>
@@ -85,6 +81,5 @@
                 </div>
             </form>
         </div>
-    </div>
-</body>
-</html>
+</div>
+@endsection

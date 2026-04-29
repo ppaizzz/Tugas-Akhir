@@ -69,9 +69,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Manager
     Route::middleware(['role:manager'])->group(function () {
-        Route::get('/manager/dashboard', function () {
-            return view('manager.dashboardMNG');
-        })->name('dashboard.manager');
+        Route::get('/manager/dashboard', [\App\Http\Controllers\Manager\LaporanController::class, 'dashboard'])->name('dashboard.manager');
+        Route::get('/manager/laporan', [\App\Http\Controllers\Manager\LaporanController::class, 'index'])->name('manager.laporan.index');
+        Route::get('/manager/laporan/export', [\App\Http\Controllers\Manager\LaporanController::class, 'exportPdf'])->name('manager.laporan.export');
     });
 
 });
