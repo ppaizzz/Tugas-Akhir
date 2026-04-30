@@ -2,27 +2,43 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Penjualan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Penjualan - GCM</title>
+    <link rel="icon" href="{{ asset('images/logo_GCM.png') }}">
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #333; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 24px; color: #2c3e50; }
-        .header p { margin: 5px 0; color: #7f8c8d; font-size: 14px; }
-        .info-table { width: 100%; margin-bottom: 15px; }
-        .info-table td { padding: 3px; border: none; }
-        table.data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .data-table th, .data-table td { border: 1px solid #bdc3c7; padding: 8px 10px; text-align: left; }
-        .data-table th { background-color: #ecf0f1; color: #2c3e50; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: #e8f4f8; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px; color: #333; line-height: 1.5; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1a1a1a; padding-bottom: 15px; }
+        .header h1 { margin: 0; font-size: 24px; color: #1a1a1a; letter-spacing: 1px; text-transform: uppercase; }
+        .header h2 { margin: 4px 0 0 0; font-size: 14px; color: #666; font-weight: normal; }
+        .info-table { width: 100%; margin-bottom: 20px; font-size: 13px; }
+        .info-table td { padding: 4px; border: none; }
+        table.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .data-table th, .data-table td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 12px; }
+        .data-table th { background-color: #f8f9fa; color: #1a1a1a; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 2px solid #ccc; }
+        .data-table tbody tr:nth-child(even) { background-color: #fafafa; }
+        .total-row { font-weight: bold; background-color: #fff9e6 !important; }
+        .total-row td { border-top: 2px solid #1a1a1a !important; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .footer { position: fixed; bottom: -20px; left: 0px; right: 0px; height: 30px; text-align: right; font-size: 10px; color: #95a5a6; }
+        .footer { margin-top: 40px; text-align: right; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
+        
+        @media print {
+            body { padding: 0; margin: 0; }
+            @page { size: landscape; margin: 10mm; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
-<body>
+<body onload="window.print()">
+    <!-- Tombol cetak manual jika otomatis gagal -->
+    <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+        <button onclick="window.print()" style="background: #FFE500; color: #000; border: none; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🖨️ Cetak Sekarang</button>
+        <button onclick="window.close()" style="background: #f1f1f1; color: #333; border: 1px solid #ccc; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 10px;">Tutup</button>
+    </div>
+
     <div class="header">
-        <h1>Laporan Penjualan Grandcitra</h1>
-        <p>Sistem Informasi Penjualan Terintegrasi</p>
+        <h1>LAPORAN PENJUALAN</h1>
+        <h2>PT Grand Citra Mandiri</h2>
     </div>
 
     <table class="info-table">
@@ -35,8 +51,8 @@
         <tr>
             <td><strong>Periode</strong></td>
             <td>: {{ $periode }}</td>
-            <td><strong>Oleh</strong></td>
-            <td>: {{ Auth::user()->name }}</td>
+            <td><strong>Jumlah Data</strong></td>
+            <td>: {{ $sales->count() }} transaksi</td>
         </tr>
     </table>
 
@@ -52,32 +68,37 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($sales as $index => $s)
+            @forelse($sales as $index => $s)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $s->created_at->format('d/m/Y H:i') }}</td>
-                <td>{{ $s->nomor_nota }}</td>
-                <td>{{ $s->cabang->nama ?? '-' }}</td>
-                <td>{{ $s->pelanggan->nama ?? 'Umum' }} <br><small>({{ $s->kasir->name ?? '-' }})</small></td>
-                <td class="text-right">{{ number_format($s->total, 0, ',', '.') }}</td>
+                <td>{{ optional($s->created_at)->format('d/m/Y H:i') ?? '-' }}</td>
+                <td>{{ $s->nomor_nota ?? '-' }}</td>
+                <td>{{ optional($s->cabang)->nama ?? '-' }}</td>
+                <td>
+                    {{ optional($s->pelanggan)->nama ?? 'Umum' }}
+                    @if($s->pelanggan && $s->pelanggan->telepon && $s->pelanggan->telepon != '-')
+                        <br><span style="color: #666; font-size: 10px;">Tel: {{ $s->pelanggan->telepon }}</span>
+                    @endif
+                    <br><span style="color: #666; font-size: 11px;">(Kasir: {{ optional($s->kasir)->name ?? '-' }})</span>
+                </td>
+                <td class="text-right">{{ number_format($s->total ?? 0, 0, ',', '.') }}</td>
             </tr>
-            @endforeach
-            
-            @if($sales->isEmpty())
+            @empty
             <tr>
-                <td colspan="6" class="text-center" style="padding: 20px;">Tidak ada data penjualan pada periode ini.</td>
+                <td colspan="6" class="text-center" style="padding: 30px; color: #666;">Tidak ada data penjualan pada periode ini.</td>
             </tr>
-            @endif
+            @endforelse
 
             <tr class="total-row">
-                <td colspan="5" class="text-right">TOTAL PENDAPATAN</td>
-                <td class="text-right">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
+                <td colspan="5" class="text-right">TOTAL PENDAPATAN : </td>
+                <td class="text-right" style="font-size: 14px;">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>
 
     <div class="footer">
-        Dicetak otomatis oleh Sistem Grandcitra &copy; {{ date('Y') }}
+        Dicetak otomatis oleh Sistem Informasi Penjualan - PT Grand Citra Mandiri &copy; {{ date('Y') }}
     </div>
 </body>
 </html>
+

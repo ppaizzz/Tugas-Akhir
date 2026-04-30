@@ -4,91 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Grandcitra System')</title>
+    <link rel="icon" href="{{ asset('images/logo_GCM.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { primary: '#4f46e5', secondary: '#10b981', dark: '#0f172a' }
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: { gcm: '#FFE500', dark: '#0f172a' }
                 }
             }
         }
     </script>
     <style>
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .glass-dark { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-right: 1px solid rgba(255, 255, 255, 0.1); }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass-dark { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 1px solid rgba(255, 255, 255, 0.05); }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; border: 2px solid #f8fafc; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .active-nav { 
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%); 
+            color: #0f172a !important; 
+            font-weight: 700; 
+            box-shadow: 0 10px 15px -3px rgba(234, 179, 8, 0.3), 0 4px 6px -2px rgba(234, 179, 8, 0.15); 
+            transform: scale(1.02);
+        }
+        .nav-link { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-link:hover:not(.active-nav) { background: rgba(255,255,255,0.08); transform: translateX(4px); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-hidden flex h-screen">
     
     <!-- Sidebar -->
     <aside class="w-72 glass-dark text-white flex flex-col shadow-2xl z-20 h-full relative overflow-y-auto">
-        <div class="p-6 border-b border-white/10 flex items-center">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg mr-3">
-                <i class="fa-solid fa-gem text-xl"></i>
-            </div>
+        <div class="p-6 border-b border-white/10 flex items-center bg-slate-900/50">
+            <img src="{{ asset('images/logo_GCM.png') }}" alt="GCM Logo" class="h-10 w-auto rounded shadow-sm mr-3 bg-white p-0.5">
             <div>
-                <h2 class="text-xl font-bold tracking-tight">Grandcitra</h2>
-                <p class="text-[10px] text-indigo-300 tracking-widest uppercase font-semibold">Sales Info System</p>
+                <h2 class="text-xl font-bold tracking-tight text-white">Grandcitra</h2>
+                <p class="text-[10px] text-yellow-400 tracking-widest uppercase font-bold">Sales Info System</p>
             </div>
         </div>
 
         <nav class="flex-1 px-4 py-8 space-y-2">
-            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Menu Utama</p>
+            <p class="px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5">Menu Utama</p>
             
             @if(Auth::user()->role == 'admin_pusat')
-                <a href="{{ route('dashboard.adminPusat') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('dashboard.adminPusat') ? 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-chart-pie w-6 opacity-80"></i> <span class="font-medium">Dashboard</span>
+                <a href="{{ route('dashboard.adminPusat') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('dashboard.adminPusat') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-chart-pie w-7 text-lg {{ request()->routeIs('dashboard.adminPusat') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Dashboard</span>
                 </a>
-                <a href="{{ route('adminPusat.barang.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('adminPusat.barang.*') ? 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-box-open w-6 opacity-80"></i> <span class="font-medium">Master Barang</span>
+                <a href="{{ route('adminPusat.barang.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('adminPusat.barang.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-box-open w-7 text-lg {{ request()->routeIs('adminPusat.barang.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Master Barang</span>
                 </a>
-                <a href="{{ route('adminPusat.permintaan.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('adminPusat.permintaan.*') ? 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-truck-fast w-6 opacity-80"></i> <span class="font-medium">Permintaan Cabang</span>
+                <a href="{{ route('adminPusat.permintaan.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('adminPusat.permintaan.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-truck-fast w-7 text-lg {{ request()->routeIs('adminPusat.permintaan.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Permintaan Cabang</span>
+                </a>
+                <a href="{{ route('adminPusat.order.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('adminPusat.order.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-cart-shopping w-7 text-lg {{ request()->routeIs('adminPusat.order.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Order Supplier</span>
+                </a>
+                <a href="{{ route('adminPusat.users.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('adminPusat.users.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-users-gear w-7 text-lg {{ request()->routeIs('adminPusat.users.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Manajemen Akun</span>
+                </a>
+                <a href="{{ route('laporan.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('laporan.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-receipt w-7 text-lg {{ request()->routeIs('laporan.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Riwayat Transaksi</span>
                 </a>
             @elseif(Auth::user()->role == 'kepala_cabang')
-                <a href="{{ route('dashboard.kepalaCabang') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('dashboard.kepalaCabang') ? 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-house w-6 opacity-80"></i> <span class="font-medium">Dashboard</span>
+                <a href="{{ route('dashboard.kepalaCabang') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('dashboard.kepalaCabang') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-house w-7 text-lg {{ request()->routeIs('dashboard.kepalaCabang') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Dashboard</span>
                 </a>
-                <a href="{{ route('kepalaCabang.stok.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('kepalaCabang.stok.*') ? 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-boxes-stacked w-6 opacity-80"></i> <span class="font-medium">Stok Cabang</span>
+                <a href="{{ route('kepalaCabang.stok.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('kepalaCabang.stok.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-boxes-stacked w-7 text-lg {{ request()->routeIs('kepalaCabang.stok.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Stok Cabang</span>
                 </a>
-                <a href="{{ route('kepalaCabang.permintaan.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('kepalaCabang.permintaan.*') ? 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-cart-flatbed w-6 opacity-80"></i> <span class="font-medium">Riwayat Permintaan</span>
+                <a href="{{ route('kepalaCabang.permintaan.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('kepalaCabang.permintaan.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-cart-flatbed w-7 text-lg {{ request()->routeIs('kepalaCabang.permintaan.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Riwayat Permintaan</span>
+                </a>
+                <a href="{{ route('laporan.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('laporan.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-file-invoice-dollar w-7 text-lg {{ request()->routeIs('laporan.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Laporan Penjualan</span>
                 </a>
             @elseif(Auth::user()->role == 'kasir')
-                <a href="{{ route('dashboard.kasir') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('dashboard.kasir') ? 'bg-gradient-to-r from-pink-500 to-rose-500 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-desktop w-6 opacity-80"></i> <span class="font-medium">Dashboard</span>
+                <a href="{{ route('dashboard.kasir') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('dashboard.kasir') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-desktop w-7 text-lg {{ request()->routeIs('dashboard.kasir') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Dashboard</span>
                 </a>
-                <a href="{{ route('kasir.pos.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('kasir.pos.*') ? 'bg-gradient-to-r from-pink-500 to-rose-500 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-cash-register w-6 opacity-80"></i> <span class="font-medium">Point of Sale</span>
+                <a href="{{ route('kasir.pos.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('kasir.pos.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-cash-register w-7 text-lg {{ request()->routeIs('kasir.pos.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Point of Sale</span>
                 </a>
-                <a href="{{ route('kasir.keep.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('kasir.keep.*') ? 'bg-gradient-to-r from-pink-500 to-rose-500 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-bookmark w-6 opacity-80"></i> <span class="font-medium">Keep Barang</span>
+                <a href="{{ route('kasir.keep.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('kasir.keep.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-bookmark w-7 text-lg {{ request()->routeIs('kasir.keep.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Keep Barang</span>
+                </a>
+                <a href="{{ route('laporan.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('laporan.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-receipt w-7 text-lg {{ request()->routeIs('laporan.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Riwayat Transaksi</span>
                 </a>
             @elseif(Auth::user()->role == 'manager')
-                <a href="{{ route('dashboard.manager') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('dashboard.manager') ? 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-chart-line w-6 opacity-80"></i> <span class="font-medium">Dashboard</span>
+                <a href="{{ route('dashboard.manager') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('dashboard.manager') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-chart-line w-7 text-lg {{ request()->routeIs('dashboard.manager') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Dashboard</span>
                 </a>
-                <a href="{{ route('manager.laporan.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('manager.laporan.*') ? 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-md text-white' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <i class="fa-solid fa-file-invoice-dollar w-6 opacity-80"></i> <span class="font-medium">Laporan Penjualan</span>
+                <a href="{{ route('laporan.index') }}" class="nav-link flex items-center px-4 py-3.5 rounded-xl {{ request()->routeIs('laporan.*') ? 'active-nav' : 'text-slate-300 hover:text-white' }}">
+                    <i class="fa-solid fa-file-invoice-dollar w-7 text-lg {{ request()->routeIs('laporan.*') ? 'opacity-100' : 'opacity-70' }}"></i> <span>Laporan Penjualan</span>
                 </a>
             @endif
         </nav>
 
-        <div class="p-4 mt-auto">
+        <div class="p-4 mt-auto border-t border-white/5">
             <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
                 <div class="flex items-center mb-4">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-200 to-slate-400 flex items-center justify-center text-slate-800 font-bold shadow-inner border-2 border-white/20">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-yellow-400 font-bold shadow-inner border border-yellow-400/30">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                     <div class="ml-3 overflow-hidden">
@@ -108,19 +131,20 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <!-- Abstract Background -->
+        <!-- Premium Abstract Background -->
         <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <div class="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-blue-300/20 blur-[100px]"></div>
-            <div class="absolute bottom-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full bg-purple-300/20 blur-[120px]"></div>
+            <div class="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-yellow-400/10 blur-[120px]"></div>
+            <div class="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-400/5 blur-[150px]"></div>
+            <div class="absolute top-[40%] left-[20%] w-[30%] h-[30%] rounded-full bg-emerald-400/5 blur-[100px]"></div>
         </div>
 
-        <header class="h-20 glass flex items-center justify-between px-10 z-10 sticky top-0">
+        <header class="h-20 glass flex items-center justify-between px-10 z-10 sticky top-0 border-b border-slate-200">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800 tracking-tight">@yield('header')</h1>
             </div>
             <div class="flex items-center space-x-5">
-                <div class="text-sm font-medium text-slate-500 bg-white/50 px-4 py-2 rounded-full border border-slate-200 shadow-sm">
-                    <i class="fa-regular fa-calendar mr-2"></i> {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+                <div class="text-sm font-medium text-slate-700 bg-white/80 px-4 py-2 rounded-full border border-yellow-300 shadow-sm flex items-center">
+                    <i class="fa-regular fa-clock text-yellow-500 mr-2"></i> <span id="realtime-clock">{{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i:s') }}</span>
                 </div>
             </div>
         </header>
@@ -153,5 +177,55 @@
     </main>
 
     @stack('scripts')
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Custom styling for SweetAlert to match GCM theme
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+        });
+
+        @if(session('success'))
+            toast.fire({
+                icon: 'success',
+                title: '{{ session("success") }}'
+            });
+        @endif
+
+        @if($errors->any())
+            toast.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan',
+                text: 'Silakan periksa kembali inputan Anda.'
+            });
+        @endif
+
+        // Real-time Clock
+        function updateClock() {
+            const now = new Date();
+            const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const formatter = new Intl.DateTimeFormat('id-ID', options);
+            let formattedDate = formatter.format(now).replace('pukul ', '');
+            
+            // Format fallback manual if Intl behaves differently
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('realtime-clock').textContent = `${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
 </body>
 </html>

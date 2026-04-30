@@ -8,6 +8,8 @@ use App\Http\Controllers\Cabang\StokController;
 use App\Http\Controllers\Cabang\PermintaanController as CabangPermintaan;
 use App\Http\Controllers\Kasir\KeepBarangController;
 use App\Http\Controllers\Kasir\PosController;
+use App\Http\Controllers\Admin\OrderSupplierController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::get('/', function () {
     return view('login');
@@ -33,6 +35,23 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin-pusat/permintaan', [AdminPermintaan::class, 'index'])->name('adminPusat.permintaan.index');
         Route::get('/admin-pusat/permintaan/{id}', [AdminPermintaan::class, 'detail'])->name('adminPusat.permintaan.detail');
         Route::post('/admin-pusat/permintaan/{id}/proses', [AdminPermintaan::class, 'proses'])->name('adminPusat.permintaan.proses');
+
+        // Order Supplier
+        Route::get('/admin-pusat/order-supplier', [OrderSupplierController::class, 'index'])->name('adminPusat.order.index');
+        Route::get('/admin-pusat/order-supplier/create', [OrderSupplierController::class, 'create'])->name('adminPusat.order.create');
+        Route::post('/admin-pusat/order-supplier', [OrderSupplierController::class, 'store'])->name('adminPusat.order.store');
+        Route::get('/admin-pusat/order-supplier/{id}', [OrderSupplierController::class, 'show'])->name('adminPusat.order.show');
+        Route::post('/admin-pusat/order-supplier/{id}/status', [OrderSupplierController::class, 'updateStatus'])->name('adminPusat.order.updateStatus');
+
+        // Manajemen Akun (User Management)
+        Route::resource('/admin-pusat/users', UserController::class)->names([
+            'index' => 'adminPusat.users.index',
+            'create' => 'adminPusat.users.create',
+            'store' => 'adminPusat.users.store',
+            'edit' => 'adminPusat.users.edit',
+            'update' => 'adminPusat.users.update',
+            'destroy' => 'adminPusat.users.destroy',
+        ])->except(['show']);
     });
 
     // Kepala Cabang
@@ -67,11 +86,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/kasir/pos/konfirmasi/{id}', [PosController::class, 'konfirmasiTransfer'])->name('kasir.pos.konfirmasi');
     });
 
+    // Laporan & Riwayat (Akses Berdasarkan Role)
+    Route::middleware(['role:manager,admin_pusat,kepala_cabang,kasir'])->group(function () {
+        Route::get('/transaksi/riwayat', [\App\Http\Controllers\Manager\LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('/transaksi/riwayat/{id}', [\App\Http\Controllers\Manager\LaporanController::class, 'show'])->name('laporan.show');
+        Route::get('/transaksi/export/pdf', [\App\Http\Controllers\Manager\LaporanController::class, 'exportPdf'])->name('laporan.export');
+    });
+
     // Manager
     Route::middleware(['role:manager'])->group(function () {
         Route::get('/manager/dashboard', [\App\Http\Controllers\Manager\LaporanController::class, 'dashboard'])->name('dashboard.manager');
-        Route::get('/manager/laporan', [\App\Http\Controllers\Manager\LaporanController::class, 'index'])->name('manager.laporan.index');
-        Route::get('/manager/laporan/export', [\App\Http\Controllers\Manager\LaporanController::class, 'exportPdf'])->name('manager.laporan.export');
     });
 
 });

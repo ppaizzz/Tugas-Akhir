@@ -6,7 +6,13 @@
 <div class="max-w-6xl mx-auto">
 <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Point of Sale (POS)</h1>
-            <div class="space-x-4">
+            <div class="space-x-4 flex items-center">
+                <span id="offline-badge" class="hidden bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full border border-orange-200 shadow-sm animate-pulse">
+                    <i class="fa-solid fa-wifi mr-1"></i> <span id="offline-count">0 Data Offline</span>
+                </span>
+                <button type="button" onclick="syncOfflineSales()" id="btn-sync" class="hidden bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-200 hover:bg-blue-200 transition">
+                    <i class="fa-solid fa-rotate mr-1"></i> Sinkronkan
+                </button>
                 <a href="{{ route('kasir.keep.index') }}" class="text-blue-600 hover:text-blue-800 font-medium">Lihat Daftar Keep</a>
                 <a href="{{ route('dashboard.kasir') }}" class="text-gray-600 hover:text-gray-800 font-medium">Dashboard</a>
             </div>
@@ -31,7 +37,7 @@
             <!-- Form POS -->
             <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-xl font-semibold mb-4 border-b pb-2 text-gray-800">Transaksi Penjualan Langsung</h2>
-                <form action="{{ route('kasir.pos.process') }}" method="POST">
+                <form action="{{ route('kasir.pos.process') }}" method="POST" id="posForm">
                     @csrf
                     
                     <div class="grid grid-cols-2 gap-4 mb-6">
@@ -41,7 +47,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">No Telepon (Opsional)</label>
-                            <input type="text" name="telepon_pelanggan" class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500">
+                            <input type="tel" name="telepon_pelanggan" oninput="this.value = this.value.replace(/[^0-9]/g, '');" class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500">
                         </div>
                     </div>
 
@@ -114,4 +120,140 @@
             </div>
         </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        updateOfflineBadge();
+        if (navigator.onLine) {
+            syncOfflineSales();
+        }
+    });
+
+    window.addEventListener('online', () => {
+        Swal.fire({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+            icon: 'success', title: 'Koneksi kembali normal. Menyinkronkan...'
+        });
+        syncOfflineSales();
+    });
+
+    window.addEventListener('offline', () => {
+        Swal.fire({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+            icon: 'warning', title: 'Koneksi terputus! Masuk ke mode Offline.'
+        });
+    });
+
+    document.getElementById('posForm').addEventListener('submit', function(e) {
+        if (!navigator.onLine) {
+            e.preventDefault();
+            
+            // Verifikasi jumlah barang (minimal 1 barang dibeli)
+            let inputs = this.querySelectorAll('input[name="jumlah[]"]');
+            let totalBeli = 0;
+            inputs.forEach(input => totalBeli += parseInt(input.value || 0));
+            
+            if (totalBeli === 0) {
+                Swal.fire('Peringatan', 'Pilih minimal 1 barang untuk dibeli.', 'warning');
+                return;
+            }
+
+            let formData = new FormData(this);
+            let entries = Array.from(formData.entries());
+            
+            let offlineSales = JSON.parse(localStorage.getItem('offlineSalesGCM') || '[]');
+            offlineSales.push(entries);
+            localStorage.setItem('offlineSalesGCM', JSON.stringify(offlineSales));
+            
+            Swal.fire({
+                icon: 'info',
+                title: 'Tersimpan Offline',
+                text: 'Transaksi berhasil disimpan sementara di perangkat Anda.',
+                showConfirmButton: false,
+                timer: 2000
+            });
+            
+            // Reset quantity inputs and customer details
+            this.reset();
+            updateOfflineBadge();
+        }
+    });
+
+    async function syncOfflineSales() {
+        if (!navigator.onLine) return;
+        
+        let offlineSales = JSON.parse(localStorage.getItem('offlineSalesGCM') || '[]');
+        if (offlineSales.length === 0) return;
+        
+        Swal.fire({
+            title: 'Sinkronisasi Berjalan...',
+            text: `Mengirim ${offlineSales.length} data offline ke server.`,
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        let remainingSales = [];
+        let successCount = 0;
+
+        for (let entries of offlineSales) {
+            let formData = new FormData();
+            entries.forEach(([key, val]) => formData.append(key, val));
+            
+            try {
+                let res = await fetch("{{ route('kasir.pos.process') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                
+                if (res.ok) {
+                    successCount++;
+                } else {
+                    remainingSales.push(entries);
+                }
+            } catch (error) {
+                remainingSales.push(entries);
+            }
+        }
+        
+        localStorage.setItem('offlineSalesGCM', JSON.stringify(remainingSales));
+        updateOfflineBadge();
+        
+        if (successCount > 0) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sinkronisasi Selesai!',
+                text: `${successCount} transaksi offline berhasil diproses.`,
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            Swal.close();
+            if (remainingSales.length > 0) {
+                Swal.fire('Gagal Sinkronisasi', 'Beberapa transaksi gagal diproses, kemungkinan stok habis.', 'error');
+            }
+        }
+    }
+
+    function updateOfflineBadge() {
+        let offlineSales = JSON.parse(localStorage.getItem('offlineSalesGCM') || '[]');
+        let badge = document.getElementById('offline-badge');
+        let countText = document.getElementById('offline-count');
+        let btnSync = document.getElementById('btn-sync');
+        
+        if (offlineSales.length > 0) {
+            badge.classList.remove('hidden');
+            btnSync.classList.remove('hidden');
+            countText.innerText = offlineSales.length + ' Data Offline';
+        } else {
+            badge.classList.add('hidden');
+            btnSync.classList.add('hidden');
+        }
+    }
+</script>
+@endpush
 @endsection

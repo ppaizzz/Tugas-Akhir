@@ -94,6 +94,10 @@ class PosController extends Controller
             ]);
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Transaksi berhasil sinkron.']);
+        }
+
         return redirect()->route('kasir.pos.index')->with('success', 'Transaksi berhasil dibuat. (' . ucfirst($status_bayar) . ')');
     }
 

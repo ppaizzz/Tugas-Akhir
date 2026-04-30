@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!Auth::check()) {
             return redirect('/login');
         }
 
-        if (Auth::user()->role !== $role) {
+        if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin.');
         }
 

@@ -10,6 +10,11 @@ class OrderSupplier extends Model
 
     protected $fillable = ['supplier_id', 'admin_id', 'status', 'tanggal_order', 'tanggal_terima'];
 
+    protected $casts = [
+        'tanggal_order' => 'date',
+        'tanggal_terima' => 'date',
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
@@ -23,5 +28,12 @@ class OrderSupplier extends Model
     public function details()
     {
         return $this->hasMany(OrderSupplierDetail::class, 'order_id');
+    }
+
+    public function getTotalAttribute()
+    {
+        return $this->details->sum(function ($d) {
+            return $d->jumlah * $d->harga_beli;
+        });
     }
 }

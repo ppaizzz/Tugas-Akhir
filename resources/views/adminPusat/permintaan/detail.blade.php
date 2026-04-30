@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Detail Permintaan - Admin Pusat')
-@section('header', 'Detail Permintaan: {{ $permintaan->cabang->nama ?? 'Cabang' }}')
+@section('header', 'Detail Permintaan: ' . ($permintaan->cabang->nama ?? 'Cabang'))
 
 @section('content')
 <div class="max-w-6xl mx-auto">
@@ -39,18 +39,34 @@
                         <thead>
                             <tr class="bg-gray-100 border-b text-gray-600 text-sm">
                                 <th class="px-4 py-2">Barang</th>
+                                <th class="px-4 py-2 text-center">Stok Tersedia (Pusat)</th>
                                 <th class="px-4 py-2 text-center">Jumlah Diminta</th>
                                 <th class="px-4 py-2 text-center">Jumlah Dikirim</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($permintaan->details as $d)
+                            @php
+                                // Ambil stok barang di Gudang Pusat (asumsi cabang_id = 1)
+                                $stokPusat = optional($d->barang->stoks->where('cabang_id', 1)->first())->jumlah ?? 0;
+                            @endphp
                             <tr class="border-b">
-                                <td class="px-4 py-3">{{ $d->barang->nama ?? '-' }}</td>
-                                <td class="px-4 py-3 text-center font-medium">{{ $d->jumlah_diminta }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="font-medium text-gray-800">{{ $d->barang->nama ?? '-' }}</span>
+                                    <div class="text-xs text-gray-500">{{ $d->barang->kode ?? '-' }}</div>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold {{ $stokPusat > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                                        {{ $stokPusat }} unit
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center font-bold text-gray-700">{{ $d->jumlah_diminta }}</td>
                                 <td class="px-4 py-3 text-center">
                                     @if($permintaan->status == 'disiapkan' || $permintaan->status == 'diajukan')
-                                        <input type="number" name="jumlah_dikirim[{{ $d->id }}]" value="{{ $d->jumlah_diminta }}" class="w-20 px-2 py-1 border rounded text-center">
+                                        <input type="number" name="jumlah_dikirim[{{ $d->id }}]" value="{{ min($d->jumlah_diminta, $stokPusat > 0 ? $stokPusat : $d->jumlah_diminta) }}" max="{{ $stokPusat }}" class="w-20 px-2 py-1.5 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded text-center outline-none transition-all">
+                                        @if($stokPusat < $d->jumlah_diminta)
+                                            <p class="text-[10px] text-red-500 mt-1">Stok tidak cukup</p>
+                                        @endif
                                     @else
                                         <span class="font-bold text-green-600">{{ $d->jumlah_dikirim }}</span>
                                     @endif
